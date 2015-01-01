@@ -1,0 +1,68 @@
+###############################################################################
+12/9/14
+Benchmarking cp on the Mark6 using cp_benchmark.sh.  
+###############################################################################
+Benchmarking cp on the Mark6 using cp_benchmark.sh.  I copied the test RDBE2
+vdif file all_r2_666.vdif (5.14GB; in /home/oper/r2dbe/software) collected at the SAO lab 
+to one of the module disks and timed how long it took cp to run moving from the home 
+directory to the disk, between disks (on the same module), and between disks on 
+different modules.  To summarize, once on the modules it took about 30 seconds to copy
+(regardless of whether it was going to a different module) but 50 seconds from the home
+directory to the disk module.
+~ cost : 5.8s/ 1GB or 171 MBps
+
+###############################################################################
+12/9/14
+Benchmarking I/O in python
+###############################################################################
+Writing out frame-by-frame (block_size=1) between modules 1 and 2 with no operations.
+first try I got 143 MBps, but later on in the hour things started to get slower (121 MBps).
+timing info:
+143 MBps (block-
+121 MBps
+193 MBps
+189 MBps (block_size = 10)
+193 MBps (block_size = 100)
+188 MBps (block_size = 100)
+
+Summary: 
+python gives similar performace to cp = 120 to 190 MBps, size of chunks doesn't seem
+to make too much difference in the I/O speed.
+
+###############################################################################
+12/11/14
+Benchmarking resample in python 
+###############################################################################
+using resample to go from 4096MHz to 1248MHz, I see a processing speed of 4.0 MBps
+(just reading and resampling, no writing). So I predict 20 minutes for the whole file 
+--> 19.66 min for 5.14 GB.
+
+with digitization and writing out, I get 0.8 MBps which would mean 107 min to process 5.14 GB.
+start @ 10:18
+
+###############################################################################
+12/11/14
+Benchmarking data conversion in python 
+###############################################################################
+I/O + bin2fp --> 17 MBps
+I/O + bin2fp + fp2bin --> 0.3 MBps
+I   + bin2fp + fp2bin --> 0.3 MBps
+
+###############################################################################
+12/13/14
+Benchmark summary:
+###############################################################################
+Using 5.14 GB data file:
+binary to floating point: 	19 MBps
+floating point to binary: 	0.3 MBps
+IO: 						120 -- 200 MBps
+resample:					6 MBps
+
+Note: for resampling I was converting 1 frame = 32768 samples = 8 microseconds of data (4096 MHz)
+to 1 frame =  9984 samples = 8 microseconds of data (1248 MHz).  
+The operation speeds then change:
+binary to floating point: 	19 MBps
+floating point to binary: 	1 MBps
+IO: 						600 MBps
+
+The timing conversions are not strictly linear due to the 32B header/frame size.
